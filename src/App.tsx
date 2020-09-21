@@ -1,26 +1,32 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Plan, PlanRepresentation } from './components/Plan';
+import { Container } from 'reactstrap';
 
-function App() {
+export const App: React.FunctionComponent = () => {
+  const [ planRepresentation, setPlanRepresentation ] = React.useState<PlanRepresentation>();
+
+  const fetchPlan = async() => {
+    const planResponse = await fetch('/plan.json');
+    setPlanRepresentation(await planResponse.json() as PlanRepresentation);
+  };
+
+  console.log(planRepresentation);
+
+  React.useEffect(() => {
+    fetchPlan();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <div>
+      <header>
+        <h1>TF Summary</h1>
       </header>
+
+      <main>
+        <Container fluid>
+          {planRepresentation !== undefined ? <Plan representation={planRepresentation} /> : null}
+        </Container>
+      </main>
     </div>
   );
-}
-
-export default App;
+};
