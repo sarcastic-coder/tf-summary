@@ -1,14 +1,10 @@
 import React from 'react';
-import { Resource, ResourceProps, ResourceRepresentation } from './Resource';
 import { Col, Container, Row } from 'reactstrap';
-
-export type ModuleRepresentation = {
-  resources: ResourceRepresentation[];
-  child_modules: ModuleRepresentation[];
-}
+import { Terraform } from '../terraform';
+import { Resource } from './Resource';
 
 export type ModuleProps = {
-  module: ModuleRepresentation;
+  module: Terraform.RootModule;
 };
 
 export const Module: React.FunctionComponent<ModuleProps> = (props) => {

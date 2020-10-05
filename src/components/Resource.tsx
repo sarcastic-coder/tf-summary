@@ -1,19 +1,9 @@
 import React from 'react';
 import { Col, Row } from 'reactstrap';
-
-export type ResourceRepresentation = {
-  address: string;
-  mode: 'managed' | 'data';
-  type: string;
-  name: string;
-  index: number;
-  provider_name: string;
-  schema_version: number;
-  values: Record<string, any>;
-};
+import { Terraform } from '../terraform';
 
 export type ResourceProps = {
-  values: ResourceRepresentation['values'];
+  values: Terraform.Resource['values'];
 };
 
 export const Resource: React.FunctionComponent<ResourceProps> = (props) => {

@@ -1,43 +1,10 @@
 import React from 'react';
-import { ModuleRepresentation } from './Module';
-import { Change, ChangeRepresentation } from './Change';
-import { Col, Row, ButtonGroup, Button } from 'reactstrap';
-
-export type ValueRepresentation = {
-  outputs: {
-    [key: string]: {
-      value: string;
-      sensitive: boolean;
-    };
-  };
-
-  root_module: ModuleRepresentation;
-};
-
-export type ResourceChange = {
-  address: string;
-  module_address?: string;
-  mode: 'managed' | 'data';
-  type: string;
-  name: string;
-  index: number;
-  deposed?: string;
-  change: ChangeRepresentation;
-};
-
-export type PlanRepresentation = {
-  format_version: string;
-  prior_state: {};
-  configuration: {};
-  planned_values: ValueRepresentation;
-  proposed_unknown: ValueRepresentation;
-  variables: {};
-  resource_changes: ResourceChange[];
-  output_changes: {};
-};
+import { Alert, Col, CustomInput, FormGroup, Input, Label, Row } from 'reactstrap';
+import { Terraform } from '../terraform';
+import { Change } from './Change';
 
 type PlanProps = {
-  representation: PlanRepresentation;
+  representation: Terraform.Plan;
 };
 
 export type ChangeFilterAction = (
@@ -50,12 +17,14 @@ export type ChangeFilterAction = (
 
 export type PlanFilter = {
   actions: ChangeFilterAction[];
+  address: string;
   type?: string[];
 };
 
 export const Plan: React.FunctionComponent<PlanProps> = (props) => {
   const [ filter, setFilter ] = React.useState<PlanFilter>({
-    actions: ['update', 'delete', 'create', 'read']
+    actions: ['update', 'delete', 'create', 'read'],
+    address: '',
   });
 
   const toggleActionFilter = (filterAction: ChangeFilterAction) => {
@@ -67,7 +36,32 @@ export const Plan: React.FunctionComponent<PlanProps> = (props) => {
       ...filter,
       actions: filteredActions,
     })
-  }
+  };
+
+  const handleAddressFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilter({
+      ...filter,
+      address: event.target.value,
+    })
+  };
+
+  const filteredChanges = props.representation.resource_changes.filter((resourceChange) => {
+    return [
+      // Name
+      () => {
+        return filter.address === '' || resourceChange.address.includes(filter.address);
+      },
+      // Operation
+      () => {
+        return filter.actions.some((a: ChangeFilterAction) => {
+          // @ts-ignore
+          return resourceChange.change.actions.includes(a);
+        });
+      },
+    ].every((filter) => {
+      return filter() === true;
+    });
+  });
 
   return <>
     <Row>
@@ -77,13 +71,32 @@ export const Plan: React.FunctionComponent<PlanProps> = (props) => {
     </Row>
     <Row>
       <Col>
-        <ButtonGroup>
-          <Button active={filter.actions.includes('no-op')} onClick={() => toggleActionFilter('no-op')}>No Change</Button>
-          <Button active={filter.actions.includes('read')} onClick={() => toggleActionFilter('read')}>Read</Button>
-          <Button active={filter.actions.includes('create')} onClick={() => toggleActionFilter('create')}>Create</Button>
-          <Button active={filter.actions.includes('update')} onClick={() => toggleActionFilter('update')}>Update</Button>
-          <Button active={filter.actions.includes('delete')} onClick={() => toggleActionFilter('delete')}>Delete</Button>
-        </ButtonGroup>
+        <FormGroup>
+          <Label>Name</Label>
+          <Input type={"search"} value={filter.address} onChange={handleAddressFilterChange} />
+        </FormGroup>
+      </Col>
+    </Row>
+    <Row>
+      <Col>
+        <h5>Operation</h5>
+        <Row>
+          <Col>
+            <CustomInput type="switch" id={"filterNoOp"} checked={filter.actions.includes('no-op')} label={"No Change"} onClick={() => toggleActionFilter('no-op')}/>
+          </Col>
+          <Col>
+            <CustomInput type="switch" id={"filterRead"} checked={filter.actions.includes('read')} label={"Read"} onClick={() => toggleActionFilter('read')}/>
+          </Col>
+          <Col>
+            <CustomInput type="switch" id={"filterCreate"} checked={filter.actions.includes('create')} label={"Create"} onClick={() => toggleActionFilter('create')}/>
+          </Col>
+          <Col>
+            <CustomInput type="switch" id={"filterUpdate"} checked={filter.actions.includes('update')} label={"Update"} onClick={() => toggleActionFilter('update')}/>
+          </Col>
+          <Col>
+            <CustomInput type="switch" id={"filterdelete"} checked={filter.actions.includes('delete')} label={"Delete"} onClick={() => toggleActionFilter('delete')}/>
+          </Col>
+        </Row>
       </Col>
     </Row>
     <Row className={"mt-3"}>
@@ -93,8 +106,13 @@ export const Plan: React.FunctionComponent<PlanProps> = (props) => {
     </Row>
     <Row>
       <Col>
-        {props.representation.resource_changes.map((change, ix) => {
-          return <Change key={ix} resourceChange={change} filter={filter} />;
+        {filteredChanges.length === 0 && <>
+          <Alert color={"info"}>
+            <p className={"mb-0"}>There is nothing to show</p>
+          </Alert>
+        </>}
+        {filteredChanges.map((change, ix) => {
+          return <Change key={ix} resourceChange={change} />;
         })}
       </Col>
     </Row>

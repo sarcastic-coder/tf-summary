@@ -1,25 +1,6 @@
 import React from 'react';
-import { Row, Col, Collapse, Alert } from 'reactstrap';
-import { ChangeFilterAction, PlanFilter, ResourceChange, ValueRepresentation } from './Plan';
-import { Module } from './Module';
-
-export type ChangeAction = (
-  | ['no-op']
-  | ['create']
-  | ['read']
-  | ['update']
-  | ['delete', 'create']
-  | ['create', 'delete']
-  | ['delete']
-);
-
-export type ChangeRepresentation = {
-  actions: ChangeAction;
-
-  before: null | Record<string, any>;
-  after: null | Record<string, any>;
-  after_unknown: null | Record<string, any>;
-};
+import { Button, Card, CardBody, CardHeader, Col, Collapse, Row } from 'reactstrap';
+import { Terraform } from '../terraform';
 
 type ChangeMapValue = {
   address: string;
@@ -81,7 +62,7 @@ const getChangeLabel = (actions: string[]) => {
   }
 
   return 'Unknown';
-}
+};
 
 const findChange = (a: unknown, b: unknown): boolean => {
   if (Array.isArray(a) && Array.isArray(b)) {
@@ -95,13 +76,24 @@ const findChange = (a: unknown, b: unknown): boolean => {
   return a !== b;
 };
 
+const formatValue = (value: string | boolean | null | any[] | Record<string, any>) => {
+  switch (typeof value) {
+    case 'string':
+      return value;
+    default:
+      return JSON.stringify(value, null, 2);
+  }
+};
+
 const ChangeRow: React.FunctionComponent<ChangeMapValue> = (props: ChangeMapValue) => {
   const { address, before, after, changed, after_unknown } = props;
+
+  const normalisedAddress = address.replace(/_/gu, ' ');
 
   if (!changed) {
     return <Row>
       <Col>
-        <h5>{address}</h5>
+        <h5>{normalisedAddress}</h5>
       </Col>
       <Col>
         No Change
@@ -109,21 +101,32 @@ const ChangeRow: React.FunctionComponent<ChangeMapValue> = (props: ChangeMapValu
     </Row>;
   }
 
-  return <Row>
+  return <Row className={"mt-2"}>
     <Col>
       <Row>
         <Col>
-          <h5>{address}</h5>
+          <h5>{normalisedAddress} (<code>{address}</code>)</h5>
         </Col>
       </Row>
-      <Row>
-        <Col md={6}>
-          <pre>{JSON.stringify(before, null, 2)}</pre>
+      <Row noGutters={true}>
+        <Col xs={12} md={6}>
+          <pre className={'p-2 m-0 bg-light'}>{formatValue(before)}</pre>
         </Col>
-        <Col md={6}>
+        <Col xs={12} md={"auto"} className={"d-flex align-items-center text-center"}>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" className="d-none d-md-block" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+
+          <svg width="1em" height="1em" viewBox="0 0 16 16" className="d-md-none mx-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fillRule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </Col>
+        <Col xs={12} md>
           {after_unknown
-            ? 'Known after apply'
-            : (<pre>{JSON.stringify(after, null, 2)}</pre>)
+            ? <p className={"m-0 p-2"}>
+              <em>Known after apply</em>
+            </p>
+            : (<pre className={'p-2 m-0 bg-light'}>{formatValue(after)}</pre>)
           }
         </Col>
       </Row>
@@ -132,30 +135,18 @@ const ChangeRow: React.FunctionComponent<ChangeMapValue> = (props: ChangeMapValu
 };
 
 type ChangeProps = {
-  resourceChange: ResourceChange;
-  filter: PlanFilter;
+  resourceChange: Terraform.ResourceChange;
 };
 
 export const Change: React.FunctionComponent<ChangeProps> = (props) => {
-  const { filter, resourceChange } = props;
+  const { resourceChange } = props;
   const [showDetails, setShowDetails] = React.useState(false);
-
-  const showChange = filter.actions.some((a: ChangeFilterAction) => {
-    // @ts-ignore
-    return resourceChange.change.actions.includes(a);
-  });
-
-  if (!showChange) {
-    return null;
-  }
 
   const toggleDetails = () => {
     setShowDetails(!showDetails);
   };
 
-  console.log(resourceChange.change.after_unknown);
-
-  const changeMap = Object.entries(resourceChange.change.before ?? {})
+  const changeMap: ChangeMap = Object.entries(resourceChange.change.before ?? {})
     .reduce(
       (combined: ChangeMap, [key, value]) => {
         const changed = combined[key] === undefined
@@ -202,50 +193,64 @@ export const Change: React.FunctionComponent<ChangeProps> = (props) => {
         )
     );
 
+  const changes = Object.values(changeMap).filter((change) => {
+    return change.changed;
+  });
+
   const alertColor = getChangeColor([...resourceChange.change.actions]);
 
-  return <Row>
+  return <Row className={"mb-2"}>
     <Col>
-      <Row>
-        <Col>
-          <Alert color={alertColor}>
-            <div onClick={toggleDetails}>
-              <Row>
-                <Col>
-                  <h4>{getChangeLabel([...resourceChange.change.actions])}</h4>
-                </Col>
-              </Row>
-              <dl>
-                <Row>
-                  <Col>
-                    <dt>Address:</dt>
-                    <dd>{resourceChange.address}</dd>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <dt>Type:</dt>
-                    <dd>{resourceChange.type}</dd>
-                  </Col>
-                </Row>
-              </dl>
-            </div>
+      <Card outline color={alertColor}>
+        <CardHeader className={`bg-${alertColor}`}>
+          {getChangeLabel([...resourceChange.change.actions])}
+        </CardHeader>
+        <CardBody>
+          <Row tag={'dl'}>
+            <Col md={4}>
+              <dt>Type:</dt>
+              <dd>{resourceChange.type}</dd>
+            </Col>
+            <Col md={8}>
+              <dt>Address:</dt>
+              <dd>{resourceChange.address}</dd>
+            </Col>
+          </Row>
+          {changes.length > 0 && <Row>
+            <Col className={'d-flex align-items-center'}>
+              <Button onClick={toggleDetails} color={alertColor}>
+                {showDetails
+                  ? <span className={'mr-1'}>Hide Changes</span>
+                  : <span className={'mr-1'}>Show Changes</span>}
+                <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style={{transition: '0.5s ease', transform: showDetails ? 'rotate(90deg)' : undefined}}>
+                  <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+              </Button>
+            </Col>
+          </Row>}
 
-            <Row>
-              <Col>
-                <Collapse isOpen={showDetails}>
-                  {Object.entries(changeMap).map(([key, change], ix) => {
-                    if (!change.changed) {
-                      return null;
-                    }
-                    return <ChangeRow key={ix} {...change} />;
-                  })}
-                </Collapse>
-              </Col>
-            </Row>
-          </Alert>
-        </Col>
-      </Row>
+          <Row className={'mt-3'}>
+            <Col>
+              <Collapse isOpen={showDetails}>
+                <Row>
+                  <Col>
+                    <h4>Changes</h4>
+                  </Col>
+                </Row>
+                {changes.map((change, ix) => {
+                  if (!change.changed) {
+                    return null;
+                  }
+                  return <React.Fragment key={ix}>
+                    <hr className={"d-md-none"} />
+                    <ChangeRow key={ix} {...change} />
+                  </React.Fragment>;
+                })}
+              </Collapse>
+            </Col>
+          </Row>
+        </CardBody>
+      </Card>
     </Col>
   </Row>;
 };
