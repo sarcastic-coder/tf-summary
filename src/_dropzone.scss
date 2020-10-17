@@ -1,0 +1,32 @@
+@import '~bootstrap/scss/_variables';
+
+.dropzone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 20px;
+  border-width: $input-border-width * 2;
+  border-radius: $input-border-radius;
+  border-color: var(--input-border-color);
+  border-style: dashed;
+  background-color: var(--input-background-color);
+  color: var(--input-color);
+  outline: none;
+  transition: border 0.24s ease-in-out;
+
+  & > div {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+  }
+
+  p {
+    margin: 0;
+    padding: 30px;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+}

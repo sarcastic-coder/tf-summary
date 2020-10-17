@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Card, CardBody, CardHeader, Col, Collapse, Row } from 'reactstrap';
-import { Terraform } from '../terraform';
+import { Terraform } from '../../terraform';
 
 type ChangeMapValue = {
   address: string;
@@ -37,28 +37,84 @@ const getChangeColor = (actions: string[]): string => {
   return 'info';
 }
 
-const getChangeLabel = (actions: string[]) => {
+const getChangeHeader = (actions: string[]) => {
   if (actions.length === 1) {
     const action = actions.shift();
 
     switch (action) {
       case 'no-op':
-        return 'No change';
+        return <>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi mr-1 bi-dash-square text-gray" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+            <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+          </svg>
+          <span>No change</span>
+        </>;
       case 'update':
-        return 'Update in place';
+        return <>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi mr-1 bi-exclamation-square text-warning" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+          </svg>
+          <span>Update in place</span>
+        </>;
       case 'delete':
-        return 'Delete';
+        return <>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi mr-1 bi-x-square text-danger" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+            <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+          <span>Delete</span>
+        </>;
+      case 'create':
+        return <>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi mr-1 bi-plus-square text-success" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+            <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+          </svg>
+          <span>Create</span>
+        </>
+      case 'read':
+        return <>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi mr-1 bi-info-square text-info" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+            <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+            <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+            <circle cx="8" cy="4.5" r="1"/>
+          </svg>
+          <span>Read</span>
+        </>
       default:
         return action;
     }
   }
 
   if (actions === ['create', 'delete']) {
-    return 'Create new before delete old';
+    return <>
+      <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi mr-1 bi-plus-square text-success" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+      </svg>
+      <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi mr-1 bi-x-square text-danger" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+        <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+      </svg>
+      <span>Create new before delete old</span>
+    </>;
   }
 
   if (actions === ['delete', 'create']) {
-    return 'Delete old before create new';
+    return <>
+      <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi mr-1 bi-x-square text-danger" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+        <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+      </svg>
+      <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi mr-1 bi-plus-square text-success" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+      </svg>
+      <span>Delete old before create new</span>
+    </>;
   }
 
   return 'Unknown';
@@ -110,7 +166,7 @@ const ChangeRow: React.FunctionComponent<ChangeMapValue> = (props: ChangeMapValu
       </Row>
       <Row noGutters={true}>
         <Col xs={12} md={6}>
-          <pre className={'p-2 m-0 bg-light'}>{formatValue(before)}</pre>
+          <pre className={'change-value p-2 m-0'}>{formatValue(before)}</pre>
         </Col>
         <Col xs={12} md={"auto"} className={"d-flex align-items-center text-center"}>
           <svg width="1em" height="1em" viewBox="0 0 16 16" className="d-none d-md-block" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -126,7 +182,7 @@ const ChangeRow: React.FunctionComponent<ChangeMapValue> = (props: ChangeMapValu
             ? <p className={"m-0 p-2"}>
               <em>Known after apply</em>
             </p>
-            : (<pre className={'p-2 m-0 bg-light'}>{formatValue(after)}</pre>)
+            : (<pre className={'change-value p-2 m-0'}>{formatValue(after)}</pre>)
           }
         </Col>
       </Row>
@@ -202,8 +258,8 @@ export const Change: React.FunctionComponent<ChangeProps> = (props) => {
   return <Row className={"mb-2"}>
     <Col>
       <Card outline color={alertColor}>
-        <CardHeader className={`bg-${alertColor}`}>
-          {getChangeLabel([...resourceChange.change.actions])}
+        <CardHeader className={"d-flex align-items-center"}>
+          {getChangeHeader([...resourceChange.change.actions])}
         </CardHeader>
         <CardBody>
           <Row tag={'dl'}>
@@ -218,7 +274,7 @@ export const Change: React.FunctionComponent<ChangeProps> = (props) => {
           </Row>
           {changes.length > 0 && <Row>
             <Col className={'d-flex align-items-center'}>
-              <Button onClick={toggleDetails} color={alertColor}>
+              <Button onClick={toggleDetails} color={"primary"}>
                 {showDetails
                   ? <span className={'mr-1'}>Hide Changes</span>
                   : <span className={'mr-1'}>Show Changes</span>}

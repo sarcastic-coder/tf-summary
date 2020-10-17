@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Col, CustomInput, FormGroup, Input, Label, Row } from 'reactstrap';
-import { Terraform } from '../terraform';
+import { Terraform } from '../../terraform';
 import { Change } from './Change';
 
 type PlanProps = {
@@ -49,7 +49,7 @@ export const Plan: React.FunctionComponent<PlanProps> = (props) => {
     return [
       // Name
       () => {
-        return filter.address === '' || resourceChange.address.includes(filter.address);
+        return filter.address === '' || resourceChange.address.includes(filter.address.toLowerCase());
       },
       // Operation
       () => {
@@ -82,19 +82,19 @@ export const Plan: React.FunctionComponent<PlanProps> = (props) => {
         <h5>Operation</h5>
         <Row>
           <Col>
-            <CustomInput type="switch" id={"filterNoOp"} checked={filter.actions.includes('no-op')} label={"No Change"} onClick={() => toggleActionFilter('no-op')}/>
+            <CustomInput type="switch" id={"filterNoOp"} checked={filter.actions.includes('no-op')} label={"No Change"} onChange={() => toggleActionFilter('no-op')}/>
           </Col>
           <Col>
-            <CustomInput type="switch" id={"filterRead"} checked={filter.actions.includes('read')} label={"Read"} onClick={() => toggleActionFilter('read')}/>
+            <CustomInput type="switch" id={"filterRead"} checked={filter.actions.includes('read')} label={"Read"} onChange={() => toggleActionFilter('read')}/>
           </Col>
           <Col>
-            <CustomInput type="switch" id={"filterCreate"} checked={filter.actions.includes('create')} label={"Create"} onClick={() => toggleActionFilter('create')}/>
+            <CustomInput type="switch" id={"filterCreate"} checked={filter.actions.includes('create')} label={"Create"} onChange={() => toggleActionFilter('create')}/>
           </Col>
           <Col>
-            <CustomInput type="switch" id={"filterUpdate"} checked={filter.actions.includes('update')} label={"Update"} onClick={() => toggleActionFilter('update')}/>
+            <CustomInput type="switch" id={"filterUpdate"} checked={filter.actions.includes('update')} label={"Update"} onChange={() => toggleActionFilter('update')}/>
           </Col>
           <Col>
-            <CustomInput type="switch" id={"filterdelete"} checked={filter.actions.includes('delete')} label={"Delete"} onClick={() => toggleActionFilter('delete')}/>
+            <CustomInput type="switch" id={"filterdelete"} checked={filter.actions.includes('delete')} label={"Delete"} onChange={() => toggleActionFilter('delete')}/>
           </Col>
         </Row>
       </Col>

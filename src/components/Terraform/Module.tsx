@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, Container, Row } from 'reactstrap';
-import { Terraform } from '../terraform';
+import { Terraform } from '../../terraform';
 import { Resource } from './Resource';
 
 export type ModuleProps = {

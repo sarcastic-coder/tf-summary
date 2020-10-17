@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, Row } from 'reactstrap';
-import { Terraform } from '../terraform';
+import { Terraform } from '../../terraform';
 
 export type ResourceProps = {
   values: Terraform.Resource['values'];

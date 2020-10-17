@@ -1,5 +1,79 @@
+$body-bg: var(--body-background);
+$body-color: var(--body-color);
+
+$card-bg: var(--card-bg);
+
+$input-color: var(--input-color);
+$input-bg: var(--input-backround-color);
+
+$hr-border-color: var(--hr-border-color);
+
 @import '~bootstrap/scss/bootstrap';
+@import '~bootstrap/scss/_variables';
+@import 'dropzone';
+
+:root {
+  @each $color, $value in $grays {
+    --gray-#{$color}: #{$value};
+  }
+
+  --body-color: #{$gray-900};
+  --body-background: var(--white);
+
+  --input-color: var(--gray-900);
+  --input-backround-color: var(--white);
+  --input-border-color: #{$input-border-color};
+
+  --hr-border-color: #{rgba($black, .1)};
+  --card-bg: var(--white);
+
+  --change-value-color: var(--body-color);
+  --change-value-background-color: var(--light);
+}
+
+html {
+  background-color: $body-bg;
+}
+
+.app {
+  flex: 1;
+  display: flex;
+  min-height: 100vh;
+  min-width: 100vw;
+  transition: all 0.5s;
+}
 
 pre {
   white-space: pre-wrap;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  text-transform: uppercase;
+  color: $gray-500;
+}
+
+hr {
+  border-color: var(--hr-border-color);
+}
+
+.separator::before, .separator::after {
+  @extend hr;
+  content: '';
+  flex: 1;
+}
+
+.separator::before {
+  margin-right: 1rem;
+}
+
+.separator::after {
+  margin-left: 1rem;
+}
+
+.change-value {
+  color: var(--change-value-color);
+  background-color: var(--change-value-background-color);
 }
