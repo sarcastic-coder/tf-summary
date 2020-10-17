@@ -87,6 +87,7 @@ export const App: React.FunctionComponent = () => {
             <Row>
               <Col>
                 <h1>TF Summary</h1>
+                <p>Summarise a Terraform plan</p>
               </Col>
               <Col xs={"auto"} className={"d-flex align-items-center"}>
                 <CustomInput id={"themeSwitch"} type={"switch"} label={theme === Theme.Dark ? 'Dark' : 'Light'} checked={theme === Theme.Dark} onChange={handleThemeToggle} />

@@ -47,6 +47,12 @@ pre {
   white-space: pre-wrap;
 }
 
+code {
+  padding: 2px;
+  border-radius: $input-border-radius;
+  border: 1px solid var(--input-backround-color);
+}
+
 .separator {
   display: flex;
   align-items: center;

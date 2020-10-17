@@ -25,7 +25,6 @@ enum FileStatus {
       try {
         const planFile = acceptedFiles.shift();
         reader.onload = (event) => {
-          console.log('File Loaded');
           setFileStatus(FileStatus.Processing);
           setPlanRepresentation(JSON.parse(event.target?.result as string));
           setFileStatus(FileStatus.Ready);
@@ -76,7 +75,6 @@ enum FileStatus {
 
     React.useEffect(
       () => {
-        console.log('Location change');
         const query = new URLSearchParams(location.search);
         const planLocation = query.get('plan');
 
@@ -117,6 +115,24 @@ enum FileStatus {
               }
             </div>
           </FormGroup>
+
+          <hr className={"mt-5"} />
+
+          <h2>About</h2>
+
+          <h3>How to Use</h3>
+
+          <p>TF Summary consumes a terraform plan file in JSON format and presents it in an easy to review format.</p>
+          <p>To get a plan file in JSON format run <code>terraform show -json tfplan &gt; tfplan.json</code> after your plan command.</p>
+          <p>See the <a href={"https://www.terraform.io/docs/commands/show.html"} target={"_blank"} rel={"noopener noreferrer"}>terraform show</a> docs for more details on the show command.</p>
+
+          <h3>How it Works</h3>
+
+          <p>The plan contents are analysed in your browser and will never be transmitted to a remote server.</p>
+
+          <h3>Contribute or Report an Issue</h3>
+
+          <p>PRs and issues submissions are welcome on <a href={"https://github.com/sarcastic-coder/tf-summary"} target={"_blank"} rel={"noopener noreferrer"}>GitHub</a>.</p>
         </>;
       case FileStatus.Loading:
         return <>
